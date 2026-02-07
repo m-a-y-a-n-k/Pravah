@@ -47,10 +47,10 @@ if (!fs.existsSync(CACHE_DIR)) {
     fs.mkdirSync(CACHE_DIR, { recursive: true });
 }
 
-function getCacheKey(req) {
+function getCacheKey(req, hostname) {
     return crypto
         .createHash("sha256")
-        .update(req.url)
+        .update(`${hostname}${req.url}`)
         .digest("hex");
 }
 
@@ -123,7 +123,7 @@ export async function handleRequest(req, res) {
     // Safety check if origin is still null (e.g. localhost wasn't in domains.json)
     const finalOrigin = origin || config.domains?.[hostname] || "https://httpbin.org";
 
-    const cacheKey = getCacheKey(req);
+    const cacheKey = getCacheKey(req, hostname);
     const cachePath = path.join(CACHE_DIR, cacheKey);
     const metaPath = `${cachePath}.json`;
 
@@ -290,8 +290,8 @@ function sendResponse(req, res, buffer, headers, cacheStatus, hostname = 'unknow
     send(buffer, null);
 }
 
-export function purgeCache(url) {
-    if (url === "all") {
+export function purgeCache(pathOrUrl, domain) {
+    if (pathOrUrl === "all") {
         console.log("🧹 Purging entire cache...");
         const files = fs.readdirSync(CACHE_DIR);
         files.forEach(file => {
@@ -304,7 +304,23 @@ export function purgeCache(url) {
         return { success: true, count: files.length };
     }
 
-    const cacheKey = crypto.createHash("sha256").update(url).digest("hex");
+    let hostname = domain;
+    let resourcePath = pathOrUrl;
+
+    // Try to extract hostname from full URL if domain not provided
+    try {
+        if (pathOrUrl.startsWith("http")) {
+            const u = new URL(pathOrUrl);
+            if (!hostname) hostname = u.hostname;
+            resourcePath = u.pathname + u.search;
+        }
+    } catch (e) { }
+
+    if (!hostname) {
+        return { success: false, error: "Domain or full URL is required to purge specific cache item." };
+    }
+
+    const cacheKey = crypto.createHash("sha256").update(`${hostname}${resourcePath}`).digest("hex");
     const cachePath = path.join(CACHE_DIR, cacheKey);
     const metaPath = `${cachePath}.json`;
 

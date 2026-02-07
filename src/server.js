@@ -164,7 +164,8 @@ if (config.cluster && cluster.isPrimary) {
 
         if (url.pathname === "/cdn-purge") {
             const path = url.searchParams.get("path") || "all";
-            const result = purgeCache(path);
+            const domain = url.searchParams.get("domain");
+            const result = purgeCache(path, domain);
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(result));
             return;
