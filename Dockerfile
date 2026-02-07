@@ -10,9 +10,9 @@ COPY . .
 # Create cache directory
 RUN mkdir -p cache-data
 
-EXPOSE 8080
+EXPOSE 5000
 
 ENV NODE_ENV=production
-ENV PORT=8080
+ENV PORT=5000
 
 CMD ["node", "src/server.js"]

@@ -1,12 +1,32 @@
 {
-  "www.youtube.com": {
-    "hostname": "www.youtube.com",
-    "origin": "https://www.facebook.com",
+  "test1.com": {
+    "hostname": "test1.com",
+    "origin": "https://www.wikipedia.org",
     "plan": "free",
     "active": true,
     "wafRules": [],
     "edgeRules": [],
     "blockedIPs": [],
-    "createdAt": "2026-02-07T11:09:25.601Z"
+    "createdAt": "2026-02-07T13:32:59.956Z"
+  },
+  "test2.com": {
+    "hostname": "test2.com",
+    "origin": "https://www.google.com",
+    "plan": "free",
+    "active": true,
+    "wafRules": [],
+    "edgeRules": [],
+    "blockedIPs": [],
+    "createdAt": "2026-02-07T13:33:07.401Z"
+  },
+  "test3.com": {
+    "hostname": "test3.com",
+    "origin": "https://www.youtube.com",
+    "plan": "free",
+    "active": true,
+    "wafRules": [],
+    "edgeRules": [],
+    "blockedIPs": [],
+    "createdAt": "2026-02-07T13:33:23.876Z"
   }
 }

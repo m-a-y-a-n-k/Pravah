@@ -105,7 +105,7 @@ if (config.cluster && cluster.isPrimary) {
             req.on("data", chunk => body.push(chunk));
             req.on("end", async () => {
                 const { hostname } = JSON.parse(Buffer.concat(body).toString());
-                const result = await dnsManager.verifyCNAME(hostname, "edge.Continuum-cdn.com");
+                const result = await dnsManager.verifyCNAME(hostname, "edge.continuum-cdn.com");
                 res.writeHead(200, { "Content-Type": "application/json" });
                 res.end(JSON.stringify(result));
             });
@@ -158,7 +158,7 @@ if (config.cluster && cluster.isPrimary) {
             await handleRequest(req, res);
         } catch (err) {
             logger.error("Proxy Error", { error: err.message });
-            logRequest("ERROR");
+            logRequest("ERROR", hostname, req.url, req.socket.remoteAddress);
             res.writeHead(500); res.end("Internal Error");
         }
     });

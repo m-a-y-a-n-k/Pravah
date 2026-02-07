@@ -3,7 +3,7 @@
   "hits": 64,
   "misses": 18,
   "errors": 12,
-  "lastUpdate": 1770462645321,
+  "lastUpdate": 1770471444020,
   "history": [],
   "bandwidth": 867990,
   "domains": {
@@ -30,5 +30,7 @@
     }
   },
   "activeDomains": 1,
-  "blocked": 0
+  "blocked": 0,
+  "regions": {},
+  "urlStats": {}
 }

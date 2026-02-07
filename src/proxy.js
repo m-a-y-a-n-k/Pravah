@@ -130,7 +130,7 @@ export async function handleRequest(req, res) {
             reason: wafResult.reason,
             hostname
         });
-        logRequest("BLOCKED", hostname);
+        logRequest("BLOCKED", hostname, req.url, req.socket.remoteAddress);
         res.writeHead(403, { "Content-Type": "text/plain" });
         return res.end(`Forbidden (Continuum WAF): ${wafResult.reason}`);
     }
@@ -172,7 +172,7 @@ export async function handleRequest(req, res) {
             if (!metaRaw[0] && metaRaw[1] && !bodyBuffer[0] && bodyBuffer[1]) {
                 const meta = JSON.parse(metaRaw[1]);
                 logger.info("Cache HIT (Redis)", { hostname, url: req.url });
-                logRequest("HIT", hostname);
+                logRequest("HIT", hostname, req.url, req.socket.remoteAddress);
                 return await sendResponse(req, res, bodyBuffer[1], meta.headers, "HIT-REDIS", hostname);
             }
         } catch (err) {
@@ -186,7 +186,7 @@ export async function handleRequest(req, res) {
             const meta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
             if (Date.now() < meta.expiresAt) {
                 logger.info("Cache HIT (Disk)", { hostname, url: req.url });
-                logRequest("HIT", hostname);
+                logRequest("HIT", hostname, req.url, req.socket.remoteAddress);
                 const buffer = fs.readFileSync(cachePath);
 
                 if (redis && redis.status === 'ready') {
@@ -212,7 +212,7 @@ export async function handleRequest(req, res) {
 
     // 3. Cache MISS - Fetch from Origin
     logger.info("Cache MISS - Fetching origin", { hostname, url: req.url, origin: finalOrigin });
-    logRequest("MISS", hostname);
+    logRequest("MISS", hostname, req.url, req.socket.remoteAddress);
 
     const originUrl = new URL(finalOrigin);
     const protocol = originUrl.protocol === "https:" ? https : http;
@@ -243,7 +243,7 @@ export async function handleRequest(req, res) {
         proxyRes.on("data", chunk => body.push(chunk));
         proxyRes.on("end", async () => {
             const buffer = Buffer.concat(body);
-            logBandwidth(buffer.length, hostname);
+            logBandwidth(buffer.length, hostname, req.url, req.socket.remoteAddress);
 
             if (req.method === "GET" && statusCode === 200) {
                 fs.writeFileSync(cachePath, buffer);
@@ -269,7 +269,7 @@ export async function handleRequest(req, res) {
 
     proxyReq.on("error", (err) => {
         logger.error("Proxy request error", { error: err.message, origin: finalOrigin });
-        logRequest("ERROR", hostname);
+        logRequest("ERROR", hostname, req.url, req.socket.remoteAddress);
         res.writeHead(502);
         res.end("Bad Gateway");
     });
@@ -315,7 +315,7 @@ async function sendResponse(req, res, buffer, headers, cacheStatus, hostname = '
         delete responseHeaders["content-length"];
         res.writeHead(200, responseHeaders);
         res.end(data);
-        logBandwidth(data.length, hostname);
+        logBandwidth(data.length, hostname, req.url, req.socket.remoteAddress);
     };
 
     if (config.compression && buffer.length > 128) {

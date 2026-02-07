@@ -9,7 +9,7 @@ export const dnsManager = {
     /**
      * Verifies if a hostname's CNAME points to the CDN's entry point.
      * @param {string} hostname - The customer's domain (e.g., blog.customer.com)
-     * @param {string} targetHost - Your CDN's entry point (e.g., edge.Continuum-cdn.com)
+     * @param {string} targetHost - Your CDN's entry point (e.g., edge.continuum-cdn.com)
      */
     async verifyCNAME(hostname, targetHost) {
         try {
