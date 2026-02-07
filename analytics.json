@@ -1,18 +1,18 @@
 {
-  "totalRequests": 85,
-  "hits": 56,
-  "misses": 17,
+  "totalRequests": 94,
+  "hits": 64,
+  "misses": 18,
   "errors": 12,
-  "lastUpdate": 1770450584957,
+  "lastUpdate": 1770451995213,
   "history": [],
-  "bandwidth": 846652,
+  "bandwidth": 867990,
   "domains": {
     "localhost": {
-      "totalRequests": 54,
-      "hits": 43,
-      "misses": 11,
+      "totalRequests": 63,
+      "hits": 51,
+      "misses": 12,
       "errors": 0,
-      "bandwidth": 837059
+      "bandwidth": 858397
     },
     "unknown": {
       "totalRequests": 9,
@@ -29,5 +29,5 @@
       "bandwidth": 9593
     }
   },
-  "activeDomains": 1
+  "activeDomains": 0
 }

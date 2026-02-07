@@ -108,14 +108,9 @@ export async function handleRequest(req, res) {
 
     if (!origin) {
         // Fallback or 404
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            // Allow localhost debugging via config if not explicitly set
-            // or just use a default safe fallback
-        } else {
-            logger.warn("Unknown host request", { hostname, url: req.url });
-            res.writeHead(404, { "Content-Type": "text/html" });
-            return res.end(renderLandingPage()); // Serve Landing Page instead of generic 404
-        }
+        logger.warn("Unknown host request", { hostname, url: req.url });
+        res.writeHead(404, { "Content-Type": "text/html" });
+        return res.end(renderLandingPage()); // Serve Landing Page for all unknown domains including localhost
     }
 
     // Safety check if origin is still null (e.g. localhost wasn't in domains.json)

@@ -7,6 +7,9 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
-    "ioredis": "^5.9.2"
+    "cookie": "^1.1.1",
+    "google-auth-library": "^10.5.0",
+    "ioredis": "^5.9.2",
+    "nodemailer": "^8.0.0"
   }
 }

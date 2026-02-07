@@ -1,8 +1,7 @@
 export const config = {
     port: process.env.PORT || 5000,
     domains: {
-        "localhost": process.env.ORIGIN || "https://httpbin.org",
-        "127.0.0.1": process.env.ORIGIN || "https://httpbin.org"
+        // No default proxying to allow system landing pages
     },
     cacheDir: "./cache-data",
     defaultTTL: 3600,

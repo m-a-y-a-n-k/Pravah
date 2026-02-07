@@ -7,8 +7,9 @@ import { config } from "./config.js";
 import { domainManager } from "./domainManager.js";
 import { renderAdminDashboard } from "./adminUi.js";
 import { renderLandingPage } from "./landing.js";
+import { renderLoginPage } from "./authUi.js";
 import { logger } from "./logger.js";
-import { checkAuth, requireAuth } from "./auth.js";
+import { checkAuth, requireAuth, sendLoginOTP, verifyLoginOTP, startGoogleLogin } from "./auth.js";
 
 const PORT = config.port;
 
@@ -16,7 +17,7 @@ if (config.cluster && cluster.isPrimary) {
     const numWorkers = config.maxWorkers || os.cpus().length;
     logger.info(`🛡️ Pravah Primary ${process.pid} is running`);
     logger.info(`📊 Dashboard available at http://localhost:${PORT}/cdn-dashboard`);
-    logger.info(`🔧 Admin Control Center at http://localhost:${PORT}/admin-dashboard (User: admin, Pass: admin123)`);
+    logger.info(`🔧 Admin Control Center at http://localhost:${PORT}/admin-dashboard (Auth: Email OTP / Google SSO)`);
 
     // Fork workers.
     for (let i = 0; i < numWorkers; i++) {
@@ -87,8 +88,17 @@ if (config.cluster && cluster.isPrimary) {
     const server = http.createServer(async (req, res) => {
         const url = new URL(req.url, `http://${req.headers.host}`);
 
+        // --- PUBLIC AUTH ROUTES ---
+        if (url.pathname === "/login") {
+            res.writeHead(200, { "Content-Type": "text/html" });
+            return res.end(renderLoginPage());
+        }
+        if (url.pathname === "/auth/login" && req.method === "POST") return sendLoginOTP(req, res);
+        if (url.pathname === "/auth/verify" && req.method === "POST") return verifyLoginOTP(req, res);
+        if (url.pathname === "/auth/google") return startGoogleLogin(req, res);
+
         // --- AUTH MIDDLEWARE FOR ADMIN ---
-        if ((url.pathname.startsWith("/admin/") || url.pathname === "/admin-dashboard") && !checkAuth(req)) {
+        if ((url.pathname.startsWith("/admin/") || url.pathname === "/admin-dashboard") && !(await checkAuth(req))) {
             return requireAuth(req, res);
         }
 
@@ -143,7 +153,7 @@ if (config.cluster && cluster.isPrimary) {
             return;
         }
 
-        if (url.pathname === "/landing" || url.pathname === "/info") {
+        if (url.pathname === "/landing" || url.pathname === "/info" || url.pathname === "/") {
             res.writeHead(200, { "Content-Type": "text/html" });
             res.end(renderLandingPage());
             return;
